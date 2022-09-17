@@ -228,9 +228,9 @@ class VCard
     private function addMedia($property, $url, $element, $include = true)
     {
         $mimeType = null;
-
+        $is_local_file = filter_var($url, FILTER_VALIDATE_URL)===false;
         //Is this URL for a remote resource?
-        if (filter_var($url, FILTER_VALIDATE_URL) !== false) {
+        if (!$is_local_file) {
             $headers = get_headers($url, 1);
 
             if (array_key_exists('Content-Type', $headers)) {
@@ -252,7 +252,7 @@ class VCard
         $fileType = strtoupper(substr($mimeType, 6));
 
         if ($include) {
-            if ((bool) ini_get('allow_url_fopen') === true) {
+            if ($is_local_file) {
                 $value = file_get_contents($url);
             } else {
                 $curl = curl_init();
